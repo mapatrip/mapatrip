@@ -12,10 +12,12 @@
             --card: #ffffff;
             --text: #1e293b;
             --text-light: #64748b;
+            --accent: #10b981;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--background); color: var(--text); padding: 40px 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { background: var(--card); max-width: 500px; width: 100%; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+        body { background-color: var(--background); color: var(--text); padding: 40px 20px; display: flex; justify-content: center; min-height: 100vh; }
+        .wrapper { max-width: 800px; width: 100%; display: flex; flex-direction: column; gap: 30px; }
+        .container { background: var(--card); width: 100%; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
         h1 { font-size: 28px; margin-bottom: 8px; text-align: center; color: var(--primary); }
         p.subtitle { text-align: center; color: var(--text-light); margin-bottom: 30px; font-size: 15px; }
         .form-group { margin-bottom: 20px; }
@@ -24,84 +26,116 @@
         input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
         button { width: 100%; padding: 14px; background-color: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.3s; margin-top: 10px; }
         button:hover { background-color: var(--primary-hover); }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: white; padding: 25px; border-radius: 12px; max-width: 450px; width: 100%; text-align: center; }
-        .modal-content h3 { margin-bottom: 12px; color: var(--text); }
-        .modal-content p { color: var(--text-light); font-size: 14px; margin-bottom: 20px; line-height: 1.5; }
-        .copy-btn { background-color: #10b981; }
-        .copy-btn:hover { background-color: #059669; }
+        
+        /* Área do Roteiro Gerado */
+        .resultado-container { display: none; background: var(--card); width: 100%; padding: 35px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border-left: 6px solid var(--accent); }
+        .resultado-header { margin-bottom: 25px; border-bottom: 2px dashed #e2e8f0; padding-bottom: 15px; }
+        .resultado-header h2 { color: var(--text); font-size: 24px; margin-bottom: 5px; }
+        .dia-bloco { margin-bottom: 25px; }
+        .dia-titulo { font-size: 18px; color: var(--primary); font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .turno { margin-bottom: 10px; padding-left: 15px; border-left: 2px solid #cbd5e1; }
+        .turno strong { color: var(--text); font-size: 15px; }
+        .turno p { color: var(--text-light); font-size: 14px; margin-top: 2px; line-height: 1.5; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>MapaTrip ✈️</h1>
-    <p class="subtitle">Monte sua viagem personalizada em segundos</p>
-    
-    <div class="form-group">
-        <label for="destino">Para onde você vai?</label>
-        <input type="text" id="destino" placeholder="Ex: Paris, Gramado, Nova York...">
+<div class="wrapper">
+    <div class="container">
+        <h1>MapaTrip ✈️</h1>
+        <p class="subtitle">Monte sua viagem personalizada em segundos</p>
+        
+        <div class="form-group">
+            <label for="destino">Para onde você vai?</label>
+            <select id="destino">
+                <option value="Pittsburgh">Pittsburgh (EUA)</option>
+                <option value="Paris">Paris (França)</option>
+                <option value="Gramado">Gramado (Brasil)</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="dias">Quantos dias de viagem?</label>
+            <input type="number" id="dias" min="1" max="5" value="5" placeholder="Ex: 5">
+        </div>
+        
+        <div class="form-group">
+            <label for="estilo">Qual o estilo da trip?</label>
+            <select id="estilo">
+                <option value="Cultural e Museus">Cultural e Museus</option>
+                <option value="Gastronômico">Gastronômico</option>
+            </select>
+        </div>
+        
+        <button onclick="gerarRoteiroAutomatico()">Gerar Meu Roteiro Mágico</button>
     </div>
-    
-    <div class="form-group">
-        <label for="dias">Quantos dias de viagem?</label>
-        <input type="number" id="dias" min="1" max="30" placeholder="Ex: 5">
-    </div>
-    
-    <div class="form-group">
-        <label for="estilo">Qual o estilo da trip?</label>
-        <select id="estilo">
-            <option value="Cultural e Museus">Cultural e Museus</option>
-            <option value="Gastronômico">Gastronômico</option>
-            <option value="Natureza e Aventura">Natureza e Aventura</option>
-            <option value="Econômico/Mochilão">Econômico / Mochilão</option>
-            <option value="Romântico / Casal">Romântico / Casal</option>
-            <option value="Relaxante / Ritmo Lento">Relaxante / Ritmo Lento</option>
-        </select>
-    </div>
-    
-    <button onclick="gerarPrompt()">Gerar Meu Roteiro Mágico</button>
-</div>
 
-<div id="promptModal" class="modal">
-    <div class="modal-content">
-        <h3>Seu roteiro está pronto para ser gerado! ✨</h3>
-        <p>Como nosso site é 100% gratuito, clique no botão abaixo para copiar as informações da sua viagem e cole diretamente no nosso chat com o Gemini para ele montar seu roteiro personalizado em segundos.</p>
-        <button class="copy-btn" id="btnCopiar" onclick="copiarTexto()">Copiar Comando da Viagem</button>
+    <div id="resultado" class="resultado-container">
+        <div class="resultado-header">
+            <h2 id="res-titulo">Seu Roteiro Personalizado</h2>
+            <p id="res-sub", style="color: var(--text-light); font-size: 14px;"></p>
+        </div>
+        <div id="roteiro-conteudo"></div>
     </div>
 </div>
 
 <script>
-    let textoParaCopiar = "";
+    // Banco de dados interno de roteiros criados por nós
+    const bancoRoteiros = {
+        "Pittsburgh": {
+            "Cultural e Museus": [
+                { dia: 1, titulo: "O Coração Cultural de Oakland", manha: "Visita às incríveis Nationality Rooms dentro da Cathedral of Learning.", tarde: "Explorar o Carnegie Museum of Art and Natural History (coleções de arte e dinossauros).", noite: "Jantar pelo charmoso bairro de Oakland e ver a fachada do Phipps Conservatory." },
+                { dia: 2, titulo: "Arte Moderna e o Legado de Warhol", manha: "Visitar o The Andy Warhol Museum (7 andares dedicados à Pop Art).", tarde: "Explorar o Mattress Factory (instalações de arte contemporânea) e a colorida Randyland.", noite: "Caminhar pela Roberto Clemente Bridge ao pôr do sol e jantar em Downtown." },
+                { dia: 3, titulo: "História Industrial e Sabores Locais", manha: "Conhecer o Senator John Heinz History Center no Strip District.", tarde: "Almoço e passeio pelos mercados, empórios e lojas de rua do Strip District.", noite: "Assistir a um espetáculo ou concerto no Cultural District em Downtown." },
+                { dia: 4, titulo: "Vistas Clássicas e Arquitetura", manha: "Subir o histórico Duquesne Incline para ter a vista mais famosa do Mt. Washington.", tarde: "Visitar a mansão histórica e as coleções de arte no The Frick Pittsburgh.", noite: "Jantar e passear pelo vibrante e acolhedor bairro de Squirrel Hill." },
+                { dia: 5, titulo: "Ciência e Confluência dos Rios", manha: "Visitar o Carnegie Science Center ou caminhar pelo histórico Point State Park.", tarde: "Tour arquitetônico a pé pelo centro de Downtown, vendo o imponente PPG Place.", noite: "Jantar de despedida em um dos restaurantes modernos de Lawrenceville." }
+            ],
+            "Gastronômico": [
+                { dia: 1, titulo: "Sabores Tradicionais", manha: "Café da manhã clássico na Pamela's Diner (famosa pelos crepes).", tarde: "Tour gastronômico por conta própria nas lanchonetes históricas do centro.", noite: "Jantar sofisticado com vista panorâmica no topo do Mt. Washington." }
+            ]
+        },
+        "Paris": {
+            "Cultural e Museus": [
+                { dia: 1, titulo: "Os Clássicos de Paris", manha: "Visita matinal ao Museu do Louvre para ver a Mona Lisa.", tarde: "Caminhada pelos Jardins das Tulherias até a Place de la Concorde.", noite: "Ver as luzes da Torre Eiffel brilharem a partir do Trocadéro." }
+            ]
+        }
+    };
 
-    function gerarPrompt() {
+    function gerarRoteiroAutomatico() {
         const destino = document.getElementById('destino').value;
-        const dias = document.getElementById('dias').value;
+        const dias Solicitados = parseInt(document.getElementById('dias').value);
         const estilo = document.getElementById('estilo').value;
 
-        if(!destino || !dias) {
-            alert("Por favor, preencha todos os campos!");
-            return;
+        // Verifica se temos o roteiro no banco
+        if (bancoRoteiros[destino] && bancoRoteiros[destino][estilo]) {
+            const roteiroCompleto = bancoRoteiros[destino][estilo];
+            // Limita os dias ao que o usuário pediu ou ao máximo disponível
+            const diasParaExibir = roteiroCompleto.slice(0, diasSolicitados);
+            
+            document.getElementById('res-titulo').innerText = `Roteiro: ${destino} ✨`;
+            document.getElementById('res-sub').innerText = `Estilo: ${estilo} | Duração ideal: ${diasParaExibir.length} dias`;
+            
+            let htmlConteudo = "";
+            
+            diasParaExibir.forEach(d => {
+                htmlConteudo += `
+                    <div class="dia-bloco">
+                        <div class="dia-titulo">📅 Dia ${d.dia}: ${d.titulo}</div>
+                        <div class="turno"><strong>☀️ Manhã:</strong><p>${d.manha}</p></div>
+                        <div class="turno"><strong>⛅ Tarde:</strong><p>${d.tarde}</p></div>
+                        <div class="turno"><strong>🌙 Noite:</strong><p>${d.noite}</p></div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('roteiro-conteudo').innerHTML = htmlConteudo;
+            document.getElementById('resultado').style.display = 'block';
+            
+            // Rola a página suavemente até o resultado
+            document.getElementById('resultado').scrollIntoView({ behavior: 'smooth' });
+        } else {
+            alert("Roteiro em desenvolvimento! Escolha 'Pittsburgh' e 'Cultural e Museus' para testar o sistema agora.");
         }
-
-        textoParaCopiar = `Olá Gemini! Usei o site MapaTrip e quero que você gere um roteiro de viagem personalizado para mim com os seguintes detalhes:\n\n` +
-                          `- Destino: ${destino}\n` +
-                          `- Duração: ${dias} dias\n` +
-                          `- Estilo da Viagem: ${estilo}\n\n` +
-                          `Por favor, divida o roteiro em Manhã, Tarde e Noite para cada dia, agrupe atrações que fiquem próximas geograficamente e dê sugestões de locais incríveis.`;
-
-        document.getElementById('promptModal').style.display = 'flex';
-    }
-
-    function copiarTexto() {
-        navigator.clipboard.writeText(textoParaCopiar).then(() => {
-            const btn = document.getElementById('btnCopiar');
-            btn.innerText = "✓ Copiado! Pode colar no chat";
-            setTimeout(() => {
-                document.getElementById('promptModal').style.display = 'none';
-                btn.innerText = "Copiar Comando da Viagem";
-            }, 2000);
-        });
     }
 </script>
 
