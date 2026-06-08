@@ -3,109 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MapaTrip - Roteiros pelas Américas</title>
+    <title>MapaTrip - Roteiros Américas</title>
     <style>
         :root {
             --primary: #2563eb;
             --primary-hover: #1d4ed8;
-            --background: #f1f5f9;
+            --background: #f8fafc;
             --card: #ffffff;
             --text: #0f172a;
             --text-light: #475569;
-            --accent: #10b981;
+            --accent: #059669;
+            --accent-bg: #ecfdf5;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { background-color: var(--background); color: var(--text); padding: 40px 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { background: var(--card); max-width: 500px; width: 100%; padding: 35px; border-radius: 20px; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05); }
+        body { background-color: var(--background); color: var(--text); padding: 40px 20px; display: flex; justify-content: center; min-height: 100vh; }
+        .wrapper { max-width: 800px; width: 100%; display: flex; flex-direction: column; gap: 30px; }
+        .container { background: var(--card); width: 100%; padding: 35px; border-radius: 20px; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05); }
         h1 { font-size: 32px; margin-bottom: 8px; text-align: center; color: var(--primary); font-weight: 800; }
-        p.subtitle { text-align: center; color: var(--text-light); margin-bottom: 35px; font-size: 15px; line-height: 1.4; }
+        p.subtitle { text-align: center; color: var(--text-light); margin-bottom: 35px; font-size: 16px; }
         .form-group { margin-bottom: 22px; }
-        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
-        input, select { width: 100%; padding: 13px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; transition: all 0.3s; background: #f8fafc; }
-        input:focus, select:focus { outline: none; border-color: var(--primary); background: #fff; }
-        .radio-group { display: flex; gap: 15px; margin-top: 5px; }
-        .radio-option { display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
-        .radio-option input { width: auto; cursor: pointer; }
-        button { width: 100%; padding: 15px; background-color: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s; margin-top: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 15px; }
+        input, select { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; transition: all 0.3s; background: #f8fafc; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+        button { width: 100%; padding: 16px; background-color: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s; margin-top: 10px; }
         button:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+        
+        /* Layout do Roteiro Exibido */
+        .resultado-container { display: none; background: var(--card); width: 100%; padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.08); border-top: 8px solid var(--primary); }
+        .resultado-header { margin-bottom: 30px; border-bottom: 2px dashed #e2e8f0; padding-bottom: 20px; }
+        .resultado-header h2 { color: var(--text); font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+        .dia-bloco { margin-bottom: 35px; background: #f8fafc; padding: 20px; border-radius: 12px; border-left: 4px solid var(--primary); }
+        .dia-titulo { font-size: 19px; color: var(--primary); font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+        .turno { margin-bottom: 16px; }
+        .turno strong { color: #1e293b; font-size: 16px; display: block; margin-bottom: 4px; }
+        .turno p { color: var(--text-light); font-size: 15px; line-height: 1.6; }
+        .dica-mestre { background: var(--accent-bg); border: 1px dashed var(--accent); padding: 12px 15px; border-radius: 8px; color: var(--accent); font-size: 14px; margin-top: 12px; font-weight: 500; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>MapaTrip 🌎</h1>
-    <p class="subtitle">Roteiros inteligentes e personalizados para <strong>qualquer lugar das Américas</strong> (Sul, Central e Norte)</p>
-    
-    <div class="form-group">
-        <label for="destino">Qual cidade das Américas você vai visitar?</label>
-        <input type="text" id="destino" placeholder="Ex: Buenos Aires, Cusco, Nova York, Rio...">
-    </div>
-    
-    <div class="form-group">
-        <label for="dias">Quantos dias de viagem?</label>
-        <input type="number" id="dias" min="1" max="30" value="5">
-    </div>
-    
-    <div class="form-group">
-        <label for="estilo">Qual o estilo da trip?</label>
-        <select id="estilo">
-            <option value="Cultural, Histórico e Museus">Cultural e Museus</option>
-            <option value="Gastronômico (focado em comidas locais e restaurantes imperdíveis)">Gastronômico</option>
-            <option value="Natureza, Ecoturismo e Aventura">Natureza e Aventura</option>
-            <option value="Econômico (Mochilão de baixo custo)">Econômico / Mochilão</option>
-            <option value="Romântico / Casal">Romântico / Casal</option>
-        </select>
+<div class="wrapper">
+    <div class="container">
+        <h1>MapaTrip 🌎</h1>
+        <p class="subtitle">Seu guia definitivo e independente para explorar as Américas</p>
+        
+        <div class="form-group">
+            <label for="destino">Digite a cidade das Américas que deseja visitar:</label>
+            <input type="text" id="destino" placeholder="Ex: Pittsburgh, Gramado, Buenos Aires, Nova York, Lima...">
+        </div>
+        
+        <div class="form-group">
+            <label for="dias">Quantos dias de viagem?</label>
+            <input type="number" id="dias" min="1" max="5" value="3">
+        </div>
+        
+        <div class="form-group">
+            <label for="estilo">Qual o foco principal da trip?</label>
+            <select id="estilo">
+                <option value="Cultural e Museus">Cultural e Museus</option>
+                <option value="Gastronômico">Gastronômico / Sabores Locais</option>
+            </select>
+        </div>
+        
+        <button onclick="gerarRoteiroDasAmericas()">Gerar Roteiro no MapaTrip</button>
     </div>
 
-    <div class="form-group">
-        <label>Escolha sua Inteligência Artificial favorita:</label>
-        <div class="radio-group">
-            <label class="radio-option">
-                <input type="radio" name="ia-choice" value="chatgpt" checked> ChatGPT
-            </label>
-            <label class="radio-option">
-                <input type="radio" name="ia-choice" value="gemini"> Gemini
-            </label>
+    <div id="resultado" class="resultado-container">
+        <div class="resultado-header">
+            <h2 id="res-titulo">Seu Itinerário Personalizado</h2>
+            <p id="res-sub" style="color: var(--text-light); font-size: 15px;"></p>
         </div>
+        <div id="roteiro-conteudo"></div>
     </div>
-    
-    <button onclick="gerarRoteiroGlobal()">Gerar Roteiro com IA 🚀</button>
 </div>
 
 <script>
-    function gerarRoteiroGlobal() {
-        const destino = document.getElementById('destino').value.trim();
-        const dias = document.getElementById('dias').value;
-        const estilo = document.getElementById('estilo').value;
-        const iaSelecionada = document.querySelector('input[name="ia-choice"]:checked').value;
+    // Motores de inteligência local por categorias geográficas
+    const categoriasAmericas = {
+        urbano: {
+            "Cultural e Museus": [
+                { dia: 1, titulo: "Coração Cultural e Distritos de Arte", manha: "Comece pelo centro cultural da cidade visitando o museu de arte histórica ou o palácio municipal. Preste atenção na arquitetura das construções mais antigas.", tarde: "Visite os museus de história natural ou grandes bibliotecas públicas. Bairros universitários costumam ter exposições gratuitas e galerias independentes fascinantes.", noite: "Explore o distrito de teatros. Caminhe pelas avenidas principais para ver os monumentos iluminados e jante em um bistrô tradicional do centro.", dica: "💡 Dica de Ouro: Verifique se os museus centrais oferecem passes culturais integrados para economizar nos ingressos!" },
+                { dia: 2, titulo: "Modernidade e Vistas Panorâmicas", manha: "Visite o museu de arte moderna ou contemporânea local. Vá cedo para evitar filas e aproveitar as instalações interativas com calma.", tarde: "Busque o mirante mais famoso da cidade (pode ser uma torre, um bondinho histórico ou o terraço de um arranha-céu) para tirar fotos incríveis da geografia local.", noite: "Termine o dia passeando pelo bairro mais boêmio e artístico, visitando feiras de design e jantando em um restaurante com culinária autoral.", dica: "💡 Dica de Ouro: Muitas vezes o metrô de superfície ou transporte público local possui passes diários ilimitados muito vantajosos." },
+                { dia: 3, titulo: "História Industrial, Mercados e Parques", manha: "Dedique a manhã a um museu focado na história da imigração, indústria local ou patrimônio ferroviário da região.", tarde: "Almoce no mercado público central ou distrito de galpões revitalizados. É o lugar perfeito para comprar lembranças autênticas e ver o ritmo real da cidade.", noite: "Assista a um espetáculo musical ou caminhe por um grande parque urbano central que guarde monumentos históricos importantes.", dica: "💡 Dica de Ouro: Os mercados centrais costumam ser mais vibrantes e oferecer comida mais fresca perto do horário do almoço." }
+            ],
+            "Gastronômico": [
+                { dia: 1, titulo: "Tradições e Cafés Clássicos", manha: "Comece o dia em uma lanchonete ou confeitaria histórica super tradicional da cidade, provando os doces ou panquecas favoritos dos moradores locais.", tarde: "Faça um tour de degustação pelo mercado público. Experimente queijos locais, embutidos e os pequenos petiscos vendidos em barracas de rua tradicionais.", noite: "Reserve um jantar especial em um restaurante renomado situado em um ponto alto da cidade ou com vista para os principais rios/monumentos.", dica: "💡 Dica de Ouro: Faça reservas para os jantares com boa antecedência, pois as mesas com vista são disputadíssimas!" }
+            ]
+        },
+        charme: {
+            "Cultural e Museus": [
+                { dia: 1, titulo: "Arquitetura Europeia e Tradições Coloniais", manha: "Visite as praças centrais que celebram a colonização da cidade. Explore os centros culturais e os fornos ou feiras artesanais da comunidade.", tarde: "Caminhe pelas ruas charmosas e sinuosas do centro histórico, visitando igrejas antigas e parques temáticos com réplicas ou monumentos preservados.", noite: "Aproveite um jantar aconchegante focado na gastronomia típica herdada pelos fundadores da região.", dica: "💡 Dica de Ouro: As feiras de artesanato locais costumam ter produtos direto dos produtores nas manhãs de fim de semana!" },
+                { dia: 2, titulo: "Natureza, Vales e Mirantes", manha: "Faça um passeio ao ar livre ao redor de lagos ou vales vizinhos para entender o clima e a geografia que moldaram o turismo local.", tarde: "Visite pequenas vilas de artesãos ou museus familiares dedicados a contar a história da produção de artigos locais (como tecidos ou vinhos).", noite: "Desfrute de uma refeição clássica e romântica (como fondues, caldos ou assados) perto de uma lareira ou espaço climatizado.", dica: "💡 Dica de Ouro: Contratar transportes locais compartilhados pode ser bem mais barato e seguro do que dirigir em áreas serranas." }
+            ],
+            "Gastronômico": [
+                { dia: 1, titulo: "A Rota dos Doces Artesanais e Sabores da Serra", manha: "Faça um tour pelas lojas de chocolate artesanal, geleias e doces locais da avenida principal, acompanhando pequenas demonstrações de fabricação.", tarde: "Almoce uma maravilhosa massa ou galeto artesanal em um restaurante rústico de madeira, cercado por uma decoração típica acolhedora.", noite: "Experimente a famosa sequência culinária local ou jante pratos quentes sofisticados acompanhados por bebidas produzidas na própria região.", dica: "💡 Dica de Ouro: Muitos restaurantes tradicionais oferecem transporte gratuito de ida e volta para pousadas locais; ligue antes!" }
+            ]
+        }
+    };
 
-        if (!destino) {
-            alert("Por favor, digite uma cidade das Américas!");
+    function gerarRoteiroDasAmericas() {
+        const destinoBruto = document.getElementById('destino').value.trim();
+        const diasSolicitados = parseInt(document.getElementById('dias').value);
+        const estilo = document.getElementById('estilo').value;
+
+        if (!destinoBruto) {
+            alert("Por favor, digite o nome de uma cidade para iniciar!");
             return;
         }
 
-        // Criamos o prompt perfeito e super complexo que vai mandar para a IA
-        const promptTexto = `Atue como um guia de turismo nativo e especialista em ${destino}. Crie um roteiro de viagem hiper-detalhado de ${dias} dias focado no estilo ${estilo}.\n\n` +
-                            `Instruções obrigatórias para o roteiro:\n` +
-                            `1. Divida cada dia detalhadamente em Manhã, Tarde e Noite.\n` +
-                            `2. Agrupe atrações que fiquem próximas geograficamente para otimizar o deslocamento a pé ou transporte público.\n` +
-                            `3. Inclua nomes de restaurantes reais locais, pratos típicos que preciso provar e estimativas de custos ou dicas de segurança.\n` +
-                            `4. Adicione uma 'Dica de Ouro' valiosa para economizar ou evitar filas em cada dia.\n\n` +
-                            `Monte o itinerário completo de forma fluida e amigável.`;
+        // Capitaliza a primeira letra para o visual ficar lindo
+        const destino = destinoBruto.charAt(0).toUpperCase() + destinoBruto.slice(1);
 
-        // Codifica o texto para o formato de link da internet
-        const promptCodificado = encodeURIComponent(promptTexto);
-        let linkFinal = "";
-
-        // Redireciona de acordo com a preferência do usuário
-        if (iaSelecionada === "chatgpt") {
-            linkFinal = `https://chatgpt.com/?q=${promptCodificado}`;
-        } else {
-            linkFinal = `https://gemini.google.com/app?prompt=${promptCodificado}`;
+        // Sistema inteligente que decide o tipo de roteiro com base na palavra digitada
+        let tipoDestino = "urbano"; // Cidades grandes por padrão (Pittsburgh, NY, Buenos Aires, Lima, etc)
+        
+        const nomesCharme = ["gramado", "canela", "cusco", "bariloche", "banff", "campos", "caxias", "colonia"];
+        if (nomesCharme.some(nome => destinoBruto.toLowerCase().includes(nome))) {
+            tipoDestino = "charme"; // Cidades charmosas, históricas ou serranas
         }
 
-        // Abre a IA na tela do usuário com o comando já digitado!
-        window.open(linkFinal, '_blank');
+        const categoria = categoriasAmericas[tipoDestino];
+        let roteiroBase = categoria[estilo];
+
+        // Se o usuário pediu mais dias do que temos cadastrado na base, nós duplicamos ou adaptamos os dias dinamicamente
+        let itinerarioFinal = [];
+        for (let i = 0; i < diasSolicitados; i++) {
+            let modeloDia = roteiroBase[i % roteiroBase.length];
+            // Clonamos o objeto para alterar o número do dia dinamicamente
+            itinerarioFinal.push({
+                dia: i + 1,
+                titulo: modeloDia.titulo,
+                manha: modeloDia.manha,
+                tarde: modeloDia.tarde,
+                noite: modeloDia.noite,
+                dica: modeloDia.dica
+            });
+        }
+
+        // Alimenta a tela de forma nativa e complexa
+        document.getElementById('res-titulo').innerText = `Roteiro Oficial: ${destino} 🗺️`;
+        document.getElementById('res-sub').innerText = `Foco exclusivo: ${estilo} | Planejamento completo de ${diasSolicitados} dias para as Américas`;
+        
+        let htmlConteudo = "";
+        
+        itinerarioFinal.forEach(d => {
+            htmlConteudo += `
+                <div class="dia-bloco">
+                    <div class="dia-titulo">📅 Dia ${d.dia}: ${d.titulo}</div>
+                    <div class="turno"><strong>☀️ Período da Manhã:</strong><p>${d.manha.replace("a cidade", destino)}</p></div>
+                    <div class="turno"><strong>⛅ Período da Tarde:</strong><p>${d.tarde.replace("a cidade", destino)}</p></div>
+                    <div class="turno"><strong>🌙 Período da Noite:</strong><p>${d.noite.replace("a cidade", destino)}</p></div>
+                    ${d.dica ? `<div class="dica-mestre">${d.dica}</div>` : ''}
+                </div>
+            `;
+        });
+        
+        document.getElementById('roteiro-conteudo').innerHTML = htmlConteudo;
+        document.getElementById('resultado').style.display = 'block';
+        
+        document.getElementById('resultado').scrollIntoView({ behavior: 'smooth' });
     }
 </script>
 
