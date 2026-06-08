@@ -73,14 +73,14 @@
     <div id="resultado" class="resultado-container">
         <div class="resultado-header">
             <h2 id="res-titulo">Seu Roteiro Personalizado</h2>
-            <p id="res-sub", style="color: var(--text-light); font-size: 14px;"></p>
+            <p id="res-sub" style="color: var(--text-light); font-size: 14px;"></p>
         </div>
         <div id="roteiro-conteudo"></div>
     </div>
 </div>
 
 <script>
-    // Banco de dados interno de roteiros criados por nós
+    // Banco de dados interno de roteiros
     const bancoRoteiros = {
         "Pittsburgh": {
             "Cultural e Museus": [
@@ -103,39 +103,37 @@
 
     function gerarRoteiroAutomatico() {
         const destino = document.getElementById('destino').value;
-        const dias Solicitados = parseInt(document.getElementById('dias').value);
+        const diasSolicitados = parseInt(document.getElementById('dias').value);
         const estilo = document.getElementById('estilo').value;
 
-        // Verifica se temos o roteiro no banco
-        if (bancoRoteiros[destino] && bancoRoteiros[destino][estilo]) {
-            const roteiroCompleto = bancoRoteiros[destino][estilo];
-            // Limita os dias ao que o usuário pediu ou ao máximo disponível
-            const diasParaExibir = roteiroCompleto.slice(0, diasSolicitados);
-            
-            document.getElementById('res-titulo').innerText = `Roteiro: ${destino} ✨`;
-            document.getElementById('res-sub').innerText = `Estilo: ${estilo} | Duração ideal: ${diasParaExibir.length} dias`;
-            
-            let htmlConteudo = "";
-            
-            diasParaExibir.forEach(d => {
-                htmlConteudo += `
-                    <div class="dia-bloco">
-                        <div class="dia-titulo">📅 Dia ${d.dia}: ${d.titulo}</div>
-                        <div class="turno"><strong>☀️ Manhã:</strong><p>${d.manha}</p></div>
-                        <div class="turno"><strong>⛅ Tarde:</strong><p>${d.tarde}</p></div>
-                        <div class="turno"><strong>🌙 Noite:</strong><p>${d.noite}</p></div>
-                    </div>
-                `;
-            });
-            
-            document.getElementById('roteiro-conteudo').innerHTML = htmlConteudo;
-            document.getElementById('resultado').style.display = 'block';
-            
-            // Rola a página suavemente até o resultado
-            document.getElementById('resultado').scrollIntoView({ behavior: 'smooth' });
-        } else {
+        if (!bancoRoteiros[destino] || !bancoRoteiros[destino][estilo]) {
             alert("Roteiro em desenvolvimento! Escolha 'Pittsburgh' e 'Cultural e Museus' para testar o sistema agora.");
+            return;
         }
+
+        const roteiroCompleto = bancoRoteiros[destino][estilo];
+        const diasParaExibir = roteiroCompleto.slice(0, diasSolicitados);
+        
+        document.getElementById('res-titulo').innerText = `Roteiro: ${destino} ✨`;
+        document.getElementById('res-sub').innerText = `Estilo: ${estilo} | Duração: ${diasParaExibir.length} dias`;
+        
+        let htmlConteudo = "";
+        
+        diasParaExibir.forEach(d => {
+            htmlConteudo += `
+                <div class="dia-bloco">
+                    <div class="dia-titulo">📅 Dia ${d.dia}: ${d.titulo}</div>
+                    <div class="turno"><strong>☀️ Manhã:</strong><p>${d.manha}</p></div>
+                    <div class="turno"><strong>⛅ Tarde:</strong><p>${d.tarde}</p></div>
+                    <div class="turno"><strong>🌙 Noite:</strong><p>${d.noite}</p></div>
+                </div>
+            `;
+        });
+        
+        document.getElementById('roteiro-conteudo').innerHTML = htmlConteudo;
+        document.getElementById('resultado').style.display = 'block';
+        
+        document.getElementById('resultado').scrollIntoView({ behavior: 'smooth' });
     }
 </script>
 
